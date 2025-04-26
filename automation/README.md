@@ -1,6 +1,6 @@
-# 🧪 Comit Users Automation
+# 🧪 Comit project - Triangle Automation
 
-This is a Selenium-based test automation project that uses **Spring Boot**, **Cucumber**, and **JUnit 5** to automate and validate user login flows on a practice site.
+This is a Selenium-based test automation project that uses **Spring Boot**, **Cucumber**, and **JUnit 5** to automate and validate triangle data on a practice site.
 
 ---
 
@@ -21,10 +21,13 @@ This is a Selenium-based test automation project that uses **Spring Boot**, **Cu
 
 ```
 src/test/java/
-├── org.comit.project.config                 # Spring context config
+├── org.comit.project.config                 # Spring cucumber, jackson config
+├── org.comit.project.contexts               # TestContext for sharing data
 ├── org.comit.project.drivers                # WebDriver management (DriverManager)
-├── org.comit.project.pageObjects            # Page Object Model (LoginPracticePage)
+├── org.comit.project.hooks                  # WebDriver screenshot
+├── org.comit.project.pageObjects            # Page Object Model (for Selenium)
 ├── org.comit.project.provider               # YML-based test property loader
+├── org.comit.project.restObjects            # EndPoint Object Model (for Rest Assured)
 ├── org.comit.project.step.definitions.page  # Step definitions for cucumber
 ├── org.comit.project.runners                # Cucumber test runner
 ```
@@ -39,7 +42,7 @@ The `config.yml` file located in `src/test/resources/` defines the test paramete
 # config.yml
 test:
   backend: "http://localhost:8080"
-  frontend: "http://localhost:4200"
+  frontend: "http://localhost:3000"
   browser: chrome
   headless: false  
   timeout: 30
@@ -62,7 +65,7 @@ Or directly from your IDE using the `RunCucumberTest` class:
 ```java
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("org/comit/users/features/page/loginPractice.feature")
+@SelectClasspathResource("org/comit/project/features/page/triangleHome.feature")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.comit.project")
 public class RunCucumberTest {}
 ```
