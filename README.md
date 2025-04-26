@@ -13,7 +13,8 @@ There are three parts
 - Automated tests for data creation, modification, and deletion
 - BDD-style test scenarios for better readability and maintainability
 
---- **Tech Stack**
+--- 
+**Tech Stack**
 ## 🌐 Frontend
 - **React 19.1.0** Component-based UI development
 - **React Router**
