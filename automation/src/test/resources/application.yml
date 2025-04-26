@@ -1,0 +1,70 @@
+
+# Logger
+logging.level:
+  '[org.comit.project]': DEBUG
+  
+# Active Profile
+spring:
+  profiles.active: test
+
+# Banner Text
+  banner:
+    charset: UTF-8
+    location: classpath:/banner/comit.txt
+          
+---
+
+# Default Profile
+spring:
+  config:
+    activate.on-profile: default 
+
+# Database Settings
+  datasource:
+    url: jdbc:h2:mem:triangledb
+    username: sa
+    password: sa1234
+    hikari:
+      maximum-pool-size: 2
+
+---
+
+# Prod Profile
+spring:
+  config:
+    activate.on-profile: prod  
+
+# Database Settings
+  datasource:
+    url: jdbc:mysql://localhost:3306/usersdb
+    username: root
+    password: rootroot
+    hikari:
+      maximum-pool-size: 2
+
+---
+
+# Test Profile
+spring:
+  config:
+    activate.on-profile: test
+      
+# Database Settings        
+  sql.init:
+    mode: always
+    data-locations: classpath:/scripts/data.sql
+    continue-on-error: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:h2:tcp://localhost:8080/mem:testdb
+    username: test
+    password: test1234
+    hikari:
+      maximum-pool-size: 2
+
+
+# Disable Database Autoconfig    
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration    
