@@ -1,0 +1,10 @@
+
+# H2 Server Configuration 
+h2:
+  server:
+    params:
+      - -tcp
+      - -tcpAllowOthers
+      - -tcpPort
+      - 9090
+    
