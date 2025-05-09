@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +37,7 @@ public class triangleController {
 			
 		} catch (IllegalArgumentException e) {
 			TriangleClassifyResponseDto error = new TriangleClassifyResponseDto();
-	        error.setResult("Error");
+	        error.setResult("Input Error");
 	        error.setExplanation(e.getMessage());
 	        return ResponseEntity.badRequest().body( error );
 		}
@@ -49,11 +51,22 @@ public class triangleController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
-	
 	@GetMapping("/record")
 	public List<Triangle> listTriangle() {
 		return this.triClassifyService.listTriangle();
 	}
 	
+	@DeleteMapping("/{id}")
+	public ResponseEntity delete(@PathVariable int id) {
+		boolean result = this.triClassifyService.deleteTriangle(id);
+		
+		if(result) {
+			//delete success
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		} else {
+			//id not found
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
 	
 }
