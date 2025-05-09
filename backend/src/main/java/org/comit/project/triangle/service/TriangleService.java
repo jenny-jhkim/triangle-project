@@ -57,8 +57,12 @@ public class TriangleService {
 		return this.triangleRepo.findById(id);
 	}
 	
-	public void deleteTriangle(int id) {
+	public boolean deleteTriangle(int id) {
+		if(!this.triangleRepo.existsById(id)) {
+			return false;
+		}
 		this.triangleRepo.deleteById(id);
+		return true;
 	}
 
 }
