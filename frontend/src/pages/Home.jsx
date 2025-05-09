@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useParams } from 'react'
 import Alert from '@mui/material/Alert';
-import CheckIcon from '@mui/icons-material/Check';
 import TriangleInput from '../components/TriangleInput'
+import AlertMessage from '../components/AlertMessage'
+import getMsgType from '../utils/getMsgType'
 import './Home.css';
 
 
@@ -19,40 +20,34 @@ function Home() {
     }
 
     const handleResult = (serverResult) => {
-        clearResult();
-        console.log("Received Data: ", serverResult);
-        const result = serverResult.result;
+        if (!serverResult) return;
+        console.log("Received Result Data: ", serverResult);
+        const data = serverResult.result;
 
-        if(result.toLowerCase().includes("error")){
+        const resultType = getMsgType(data);
+        console.log("getMsgType: ", resultType);
+        setMsgType(resultType);
+        if(resultType ==="error"){
+            setResult("");
             setMessage(serverResult.result + " : " + serverResult.explanation);
-            setMsgType("error");
             return;
-            
         } 
-        if(result.toLowerCase().includes("not a triangle")) {
-            setMsgType("info");
-        } else {
-            setMsgType("success");
-        }
+
         setResult(serverResult.result);
         setMessage(serverResult.explanation);
+
     }
 
     return (
         <div>
             <h1 className='main-title-container'>Types of Triangles {mode==='edit' ? `Edit ${id}` : ""} </h1>
-            <p></p>
             <div className='home-triangle-contianer'>
                 <TriangleInput mode={mode} onResult={handleResult} />
                 <div className='home-message-container'>
                 { result && 
                     <h2> Result: {result} </h2>
                 }
-                { message &&
-                    <Alert severity={msgType}>
-                        {message}
-                    </Alert>
-                }
+                <AlertMessage msgType={msgType} message={message} />
                 </div>
             </div>
         </div>

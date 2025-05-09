@@ -4,17 +4,19 @@ import {
     Box, Paper, Button
 } from '@mui/material'
 import {getTriangleRecords, deleteTriangleById} from '../api/triangleApi'
+import AlertMessage from '../components/AlertMessage';
+import getMsgType from '../utils/getMsgType'
 import './TriangleRecord.css'
-import { prefetchDNS } from 'react-dom'
-
 
 function TriangleRecord() {
     const [triangles, setTriangles] = useState([]);
+    const [message, setMessage] = useState("");
+    const [msgType, setMsgType] = useState("success");
 
     useEffect( ()=> {
         getTriangleRecords()
         .then(data => {
-            console.log("Received data: ", data);
+            console.log("list data: ", data);
             if(data.length > 0) {
                 setTriangles(data);
             }
@@ -30,8 +32,13 @@ function TriangleRecord() {
     };
     
     const handleDelete = async(id) => {
-        await deleteTriangleById(id);
-        setTriangles(prev => prefetchDNS.filter(triangle => triangle.id !== id));
+        const res = await deleteTriangleById(id);
+        const resultType = getMsgType(res.result);
+
+        setTriangles(prev => prev.filter(triangle => triangle.id !== id));
+
+        setMsgType(resultType);
+        setMessage(res.explanation);
     }
 
 
@@ -76,6 +83,7 @@ function TriangleRecord() {
             </Table>
             </TableContainer>
             {triangles.length === 0 && <p>No data found</p>}
+            <AlertMessage msgType={msgType} message={message} />
             </Box>
         </div>
     );

@@ -1,12 +1,16 @@
 import React, {useState, useEffect} from 'react'
 import { FormControl, InputLabel, Select,FormHelperText, MenuItem, TextField, Box, Paper, Stack, Button } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
-import {getTriangleClassify} from '../api/triangleApi'
+import SaveIcon from '@mui/icons-material/Save'
+import {getTriangleClassify , createTriangle } from '../api/triangleApi'
+import getMsgType from '../utils/getMsgType'
 import './TriangleInput.css'
 
 function TriangleInput( {mode, onResult} ) {
     const [inputType, setInputType ] = useState("Sides");
     const [inputs, setInputs] = useState({ a: "", b: "", c: "" });
+    const [result, setResult] = useState( {result: "", explanation: ""});
+    const [saveEnable, setEnable] = useState(false);
 
     const triangleData = {
         inputType,
@@ -15,27 +19,30 @@ function TriangleInput( {mode, onResult} ) {
         c: parseInt(inputs.c),
     };
 
-    let result = {
-        result: "",
-        explanation: ""
-    };
-
     /*
-
     useEffect(() => {
         if (mode === "edit" && editData) {
-          setInputs(editData); // 기존 값으로 초기화
+          setInputs(editData);
+        } else {
+          clearData();
         }
       }, [mode, editData]);
       */
     
+    useEffect( ()=> {
+        if(result && ( result.result || result.explanation )) {
+            onResult(result);
+        };
+    }, [result]);
+
     useEffect( () => {
-        getTriangleClassify();
-    }, []);
+        setEnable(false); // Prevent saving unintended values without checking
+
+    } , [inputType, inputs]);
 
     const handleInputTypeChange = (e) => {
         setInputType(e.target.value);
-    }
+    };
 
     const handleInputChange = (e) => {
         setInputs({ ...inputs, [e.target.name]: e.target.value });
@@ -44,14 +51,56 @@ function TriangleInput( {mode, onResult} ) {
     const handleCheck = async() => {
 
         if(!inputs.a || !inputs.b || !inputs.c) {
-            result.result="Input Error"
-            result.explanation = "All fields are required."
+            setResult({
+                result: "Input Error",
+                explanation: "All fields are required."
+            });
+            return;
         }
         else {
             console.log("Check: submit data", triangleData);
-            result = await getTriangleClassify(triangleData);
+            const res = await getTriangleClassify(triangleData);
+            setResult(res);
+
+            //enable the save button
+            const type = getMsgType(res.result);
+            if(type === 'success' || type ==='info')
+            {
+                setTimeout( ()=> {
+                    setEnable(true);
+                }, 500);
+            } else {
+                setEnable(false);
+            }
         }
-        onResult(result);
+    }
+
+    const handleSave = async() => {
+
+        const triangleData = {
+            inputType,
+            a: parseInt(inputs.a),
+            b: parseInt(inputs.b),
+            c: parseInt(inputs.c),
+            triangleType: result.result
+        };
+
+        try{
+            const response = await createTriangle(triangleData);
+            console.log("Saved: res", response);
+            clearData();
+            setResult(response);
+        } catch (error) {
+            result.result = "Save Error"
+            result.explanation = error;
+            onResult(result);
+        }
+    }
+
+    const clearData = () => {
+        setInputs({ a: "", b: "", c: "" });
+        setResult({result: "", explanation: ""});
+        setEnable(false);
     }
 
     return (
@@ -85,8 +134,18 @@ function TriangleInput( {mode, onResult} ) {
                     name="c" id="inputC" value={inputs.c} onChange={handleInputChange} />
             </Stack>
             <Stack direction="row" spacing={2}>
-                <Button id="checkButton" variant="outlined" endIcon={<SendIcon />} onClick={handleCheck}>Check</Button>
-                <Button id="saveButton" variant="contained" color="success" endIcon={<SendIcon />} disabled>Save</Button>
+                <Button id="checkButton"
+                    variant="outlined"
+                    endIcon={<SendIcon />}
+                    onClick={handleCheck}
+                > Check </Button>
+                <Button id="saveButton"
+                    variant="contained"
+                    color="success"
+                    endIcon={<SaveIcon />}
+                    onClick={handleSave}
+                    disabled={!saveEnable}
+                > {mode==="save" ? "save" : "UPDATE"} </Button>
             </Stack>
             </div>
         </Paper>
