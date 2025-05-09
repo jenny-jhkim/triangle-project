@@ -16,7 +16,7 @@ function TriangleRecord() {
         .then(data => {
             console.log("Received data: ", data);
             if(data.length > 0) {
-                setTriangles(data``);
+                setTriangles(data);
             }
         })
         .catch(error => {
@@ -75,7 +75,7 @@ function TriangleRecord() {
                 </TableBody>
             </Table>
             </TableContainer>
-            {triangles.length == 0 && <p>No data found</p>}
+            {triangles.length === 0 && <p>No data found</p>}
             </Box>
         </div>
     );
